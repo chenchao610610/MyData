@@ -1,6 +1,7 @@
 #include<stdio.h>
 #define max 12
 
+
 int num[max+1],m,n,lenth;
 int used[max+1];
 
