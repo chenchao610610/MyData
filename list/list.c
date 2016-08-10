@@ -1,257 +1,285 @@
-/* list.c ---
- *
- * Filename: list.c
- * Description: list implementation file.
- * Author: bigclean
- * Created: Wed Aug 25 15:37
- * Last-Updated: Wed Aug 25 15:37
- */
-
-/* Code: */
-
-/**
- * @file list.c
- * @brief list implementation
- */
-
+/**********************
+   list
+   created at:2016-08-10
+**********************/
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
-#include <setjmp.h>
 
-#include "list.h"
+typedef int elemType;
 
-/*
- * link node operations
- */
-link_node *
-link_node_make(elem_type elem)
+struct List{
+    elemType *list;
+    int size;
+    int maxSize;
+};
+
+//空间扩展 1 倍，并由 p 指针所指向
+void againMalloc(struct List *L)
 {
-        link_node *node =(link_node *) malloc(sizeof(link_node));
-        assert(node != NULL);
-        node->data = elem;
-        node->prev = node->next = NULL; /* pointer should be initialized */
-        return node;
+    elemType *p = realloc(L->list, 2 * L->maxSize * sizeof(elemType));
+    if (!p)
+    {
+        printf("存储空间分配失败。");
+        exit(1);
+    }
+    L->list = p;
+    L->maxSize = 2 * L->maxSize;
 }
 
-void
-link_node_free(link_node *node)
+//初始化线性表 L
+void initList(struct List *L, int ms)
 {
-        free(node);
-        node = NULL;
+    if (ms <= 0)
+    {
+        printf("MaxSize 非法。");
+        exit(1);
+    }
+    L->maxSize = ms;
+    L->size = 0;
+    L->list = malloc(ms * sizeof(elemType));
+    if (!L->list)
+    {
+        printf("空间分配失败。");
+        exit(1);
+    }
+    return;
 }
 
-/* callback function for link_list_foreach(), similar iterator */
-void
-link_node_visit(link_node *node)
+//清楚线性表 L 中的所有元素，释放存储空间，成为一个空表
+void clearList(struct List *L)
 {
-        /* TODO: beautify output. */
-        printf("element field is %d\n", node->data);
+    if (L->list != NULL)
+    {
+        free(L->list);
+        L->list = 0;
+        L->size = L->maxSize = 0;
+    }
+    return;
 }
 
-/*
- * linked list operations
- */
-
-/*
- * create link list
- */
-link_list *
-link_list_create(void)
+//返回线性表 L 当前的长度
+int sizeList(struct List *L)
 {
-        /* in this version, link list has head and tail node */
-        link_list *list = (link_list *) malloc(sizeof(link_list));
-        if (!list) {
-                /* return ERROR; */
-                printf("memory error.\n");
+    return L->size;
+}
+
+//判断线性表 L 是否为空
+int emptyList(struct List *L)
+{
+    if (L->size == 0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+//返回线性表 L 中第 pos 个元素的值
+elemType getElem(struct List *L, int pos)
+{
+    if (pos < 1 || pos > L->size)
+    {
+        printf("元素序号越界。");
+        exit(1);
+    }
+    return L->list[pos-1];
+}
+
+//遍历并输出每个元素
+void traverseList(struct List *L)
+{
+    int i;
+
+    for (i = 0; i < L->size; i++)
+    {
+        printf("%d ", L->list[i]);
+    }
+
+    return;
+}
+
+//查找 x 元素，返回其位置
+int findList(struct List *L, elemType x)
+{
+    int i;
+
+    for (i = 0; i < L->size; i++)
+    {
+        if (L->list[i] == x)
+        {
+            return i;
         }
-        list->head = (link_node *) malloc(sizeof(link_node));
-        list->tail = (link_node *) malloc(sizeof(link_node));
+    }
 
-        list->head->prev = NULL;
-        list->tail->next = NULL;
-
-        /* concatenate head and tail node to construct list */
-        list->head->next = list->tail;
-        list->tail->prev = list->head;
-        list->length = 0;
-
-        return list;
+    return -1;
 }
 
-/*
- * when next is NULL it would inserts after the tail
- */
-void
-link_list_insert_before(link_list *list,
-        link_node *next, elem_type elem)
+//将第 pos 个元素修改为 x，成功则返回 1
+int updataPosList(struct List *L, int pos, elemType x)
 {
-        /* if (next->prev == NULL) { */
-        /*         printf("inserts before head node, error.\n"); */
-        /* } */
-        assert(next->prev);
-        link_node *newnode = link_node_make(elem);
-        link_node *prev = next->prev;
-
-        newnode->prev = prev;
-        newnode->next = next;
-
-        prev->next = newnode;
-        next->prev = newnode;
-
-        list->length++;
+    if (pos < 1 || pos > L->size)
+    {
+        return 0;
+    }
+    L->list[pos-1] = x;
+    return 1;
 }
 
-/*
- * insert after
- */
-void
-link_list_insert_after(link_list *list,
-        link_node *prev, elem_type elem)
+//在线性表表头插入元素 x
+void insertFirstList(struct List *L, elemType x)
 {
-        /* Now use assert() macro */
-        /* if (prev->next == NULL) { */
-        /*        printf("inserts after tail node, error.\n"); */
-        /* } */
-        assert(prev->next);
-        /* 
-         * Note: ISO C90 mixed declarations and code 
-         * XXX: to solve this, always declarations go first, and if
-         *      parameter is illegal and then free allocated memory.
-         */
-        link_node *newnode = link_node_make(elem);
-        link_node *next = prev->next;
+    int i;
 
-        newnode->prev = prev;
-        newnode->next = next;
+    if (L->size == L->maxSize)
+    {
+        againMalloc(L);
+    }
 
-        prev->next = newnode;
-        next->prev = newnode;
-
-        list->length++;
+    for (i = L->size - 1; i >= 0; i--)
+    {
+        L->list[i+1] = L->list[i];
+    }
+    L->list[0] = x;
+    L->size++;
+    return;
 }
 
-void
-link_list_insert_first(link_list *list, elem_type elem)
+//在线性表表尾插入元素 x
+void insertLastList(struct List *L, elemType x)
 {
-        /*
-         * TODO: list->head->next is NULL when only head and tail node
-         * exists in list(when create list only).
-         * XXX: in create list function, you can concatenate head and
-         * tail node together.
-         */
-        link_node *newnode = link_node_make(elem);
-        link_node *next = list->head->next;
-        newnode->next = next;
-        newnode->prev = list->head;
-        /* head node refers to newnode */
-        list->head->next = newnode;
-        next->prev = newnode;
-        list->length++;
+    if (L->size == L->maxSize)
+    {
+        againMalloc(L);
+    }
+    L->list[L->size] = x;
+    L->size++;
+    return;
 }
 
-/*
- * insert node after tail of list
- */
-void
-link_list_append(link_list *list, elem_type elem)
+//在线性表 pos 处插入元素 x
+int insertPosList(struct List *L, int pos, elemType x)
 {
-        link_node *newnode = link_node_make(elem);
-        link_node *prev = list->tail->prev;
-        newnode->next = list->tail;
-        newnode->prev = prev;
-        /* tail node refers to newnode */
-        list->tail->prev = newnode;
-        prev->next = newnode;
-        list->length++;
+    int i;
+
+    if (pos < 1 || pos > L->size + 1)
+    {
+        return 0;
+    }
+    if (L->size == L->maxSize)
+    {
+        againMalloc(L);
+    }
+    for (i = L->size - 1; i >= pos - 1; i--)
+    {
+        L->list[i+1] = L->list[i];
+    }
+    L->list[pos-1] = x;
+    L->size++;
+    return 1;
 }
 
-void
-link_list_delete(link_list *list, link_node *node)
+//向有序列表中插入元素 x，依然有序
+void insertOrderList(struct List *L, elemType x)
 {
-        link_node *prev = node->prev;
-        link_node *next = node->next;
-        if (prev) {
-                prev->next = next;
-        } else {
-                /*
-                 * deleted node is head node, and 'next' node would be
-                 * first node of link list, so it would place 'next' node
-                 * as new head node of link list.
-                 */
-                list->head =next;
+    int i, j;
+
+    if (L->size == L->maxSize)
+    {
+        againMalloc(L);
+    }
+
+    for (i = 0; i < L->size; i++)
+    {
+        if (x < L->list[i])
+        {
+            break;
         }
+    }
+    for (j = L->size - 1; j >= i; j--)
+    {
+        L->list[j+1] = L->list[j];
+    }
+    L->list[i] = x;
+    L->size++;
+    return;
+}
 
-        if (next) {
-                next->prev = prev;
-        } else {
-                /*
-                 * deleted node is tail node, and 'prev' node would be
-                 * last node of link list, so it would place 'prev' node
-                 * as new tail node of link list.
-                 */
-                list->tail = prev;
+//删除线性表表头元素，并返回改元素
+elemType deleteFirstList(struct List *L)
+{
+    elemType temp;
+    int i;
+
+    if (L->size == 0)
+    {
+        printf("线性表为空，不能进行删除操作。");
+        exit(1);
+    }
+    temp = L->list[0];
+    for (i = 1; i < L->size; i++)
+    {
+        L->list[i-1] = L->list[i];
+    }
+    L->size--;
+    return temp;
+}
+
+//删除线性表表尾元素，并返回改元素
+elemType deleteLastList(struct List *L)
+{
+    if (L->size == 0)
+    {
+        printf("线性表为空，不能进行删除操作。");
+        exit(1);
+    }
+    L->size--;
+    return L->list[L->size];
+}
+
+//删除线性表第 pos 个元素，并返回改元素
+elemType deletePosList(struct List *L, int pos)
+{
+    elemType temp;
+    int i;
+
+    if (pos < 1 || pos > L->size)
+    {
+        printf("pos 值越界。");
+        exit(1);
+    }
+    temp = L->list[pos-1];
+    for (i = pos; i < L->size; i++)
+    {
+        L->list[i-1] = L->list[i];
+    }
+    L->size--;
+    return temp;
+}
+
+//删除线性表为 x 的第一个元素
+int deleteValueList(struct List *L, elemType x)
+{
+    int i, j;
+
+    for (i = 0; i < L->size; i++)
+    {
+        if (L->list[i] == x)
+        {
+            break;
         }
-        link_node_free(node);
-        list->length--;
-}
+    }
 
-Bool link_list_isempty(const link_list *list)
-{
-        return (list_length(list) == 0);
-}
+    if (i == L->size)
+    {
+        return 0;
+    }
 
-void link_list_destroy(link_list *list)
-{
-        /* destroy nodes of link list */
-        link_node *current = list->head;
-        link_node *next = NULL;
-        while (current) {
-               next  = current->next;
-               free(current);
-               current = next;
-        }
-        free(list); /* destroy link list itself */
+    for (j = i + 1; j < L->size; j++)
+    {
+        L->list[j-1] = L->list[j];
+    }
+    L->size--;
+    return 1;
 }
-
-/* this function use call-back tips */
-void link_list_foreach(link_list *list, link_node_callback callback)
-{
-        link_node *current = list->head->next;
-        while (current->next) {
-                callback(current);
-                current = current->next;
-        }
-}
-
-void link_list_traverse(link_list *list)
-{
-        link_list_foreach(list, link_node_visit);
-}
-
-int main(int argc, char **argv)
-{
-        printf("----------------------------------------------\n");
-        printf("starts to have a test of list.\n");
-        printf("----------------------------------------------\n");
-        link_list *list = link_list_create();
-        link_list_insert_first(list, 1);
-        link_list_insert_first(list, 2);
-        link_list_insert_first(list, 3);
-        link_list_insert_first(list, 4);
-        link_list_append(list, 5);
-        link_list_append(list, 6);
-        link_list_delete(list, list->tail->prev->prev);
-        link_list_insert_after(list, list->tail->prev->prev, 10);
-        link_list_insert_before(list, list->tail->prev->prev, 9);
-        link_list_traverse(list);
-        /* printf("another is %d.\n", list->tail->prev->prev->next->data); */
-        printf("ok, now length is %d.\n", list->length);
-        printf("----------------------------------------------\n");
-        printf("test is finished. everything is gone be alright.\n");
-        printf("----------------------------------------------\n");
-        printf("\n");
-
-        return EXIT_SUCCESS;
-}
-/* list.c ends here */

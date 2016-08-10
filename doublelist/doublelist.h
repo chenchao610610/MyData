@@ -1,18 +1,9 @@
-/* list-class.h --- 
- * 
- * Filename: list-class.h
- * Description: list class header using OOP perspect
- * Author: bigclean <potteryzero at gmail dot com>
- * Created: Wed Aug 25 15:41
- * Last-Updated: Wed Aug 25 15:41
+/* doublelist.h
+ * Filename: doublelist.h
+ * Description: double list header using OOP perspect
+ * created at: 2016-08-10
  */
 
-/* Code: */
-
-/**
- * @file list-class.h
- * @brief list header file but use OOP perspect
- */
 
 #ifndef __LIST_CLASS_H_
 #define __LIST_CLASS_H_

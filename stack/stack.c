@@ -2,16 +2,7 @@
  * 
  * Filename: stack.c
  * Description: stack implemention, now including sequence stack.
- * Author: bigclean
- * Created: Wed Aug 25 15:37
- * Last-Updated: Wed Aug 25 15:37
- */
-
-/* Code: */
-
-/**
- * @file stack.c
- * @brief stack implementation, now sequence stack only
+ * Last-Updated: 2016-08-10
  */
 
 #include <stdio.h>

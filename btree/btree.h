@@ -2,18 +2,7 @@
  * 
  * Filename: btree.h
  * Description: 
- * Author: bigclean
- * Created: Wed Aug 25 15:40
- * Last-Updated: Wed Aug 31 21:39
- */
-
-/* Code: */
-
-/**
- * @file btree.h
- * @brief binary tree head file
- * @todo Should it distinguish binary tree with binary tree node?
- *       Should let ::btree as syntatic sugar always?
+ * created at: 2016-08-10
  */
 
 #ifndef __BTREE_H_

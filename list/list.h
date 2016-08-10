@@ -2,16 +2,7 @@
  * 
  * Filename: list.h
  * Description:
- * Author: bigclean <potteryzero at gmail dot com>
- * Created: Wed Aug 25 15:40
- * Last-Updated: Wed Aug 25 15:40
- */
-
-/* Code: */
-
-/**
- * @file list.h
- * @brief list header file
+ * created at: 2016-08-10
  */
 
 #ifndef __LIST_H_

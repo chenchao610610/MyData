@@ -2,16 +2,7 @@
  * 
  * Filename: stack.h
  * Description: stack header file
- * Author: bigclean
- * Created: Wed Aug 25 15:43
- * Last-Updated: Wed Aug 25 15:43
- */
-
-/* Code: */
-
-/**
- * @file stack.h
- * @brief stack header file
+ * Last-Updated: 2016-08-10
  */
 
 #ifndef __STACK_H_

@@ -1,25 +1,17 @@
-/* list-class.c ---
+/* doublelist.c
  *
- * Filename: list-class.c
+ * Filename: doublelist.c
  * Description: list implementation file.
- * Author: bigclean
- * Created: Wed Aug 25 15:39
- * Last-Updated: Wed Aug 25 15:39
+ * created at: 2016-08-10
  */
 
-/* Code: */
-
-/**
- * @file list-class.c
- * @brief list implementation
- */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <setjmp.h>
 
-#include "list-class.h"
+#include "doublelist.h"
 
 /*
  *  node operations

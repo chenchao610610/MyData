@@ -2,18 +2,9 @@
  * 
  * Filename: strucol.h
  * Description: general types defintion
- * Author: bigclean <potteryzero at gmail dot com>
- * Created: Wed Aug 25 15:43
- * Last-Updated: Wed Aug 25 15:43
+ * Last-Updated: 2016-08-10
  */
 
-/* Code: */
-
-/**
- * @file structure.h
- * @brief general types for this project
- * @date Aug 19, 2010
- */
 
 #ifndef __STRUCTURE_H_
 #define __STRUCTURE_H_
